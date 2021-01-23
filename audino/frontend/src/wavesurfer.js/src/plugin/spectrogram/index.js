@@ -74,10 +74,11 @@ export default class SpectrogramPlugin {
     }
  
     constructor(params, ws) {
+        this.colorData = null;
         this.params = params;
         this.wavesurfer = ws;
         this.util = ws.util;
- 
+        this.worker =  new Worker("offscreencanvas.js") || null;
         this.frequenciesDataUrl = params.frequenciesDataUrl;
         this._onScroll = e => {
             this.updateScroll(e);
@@ -92,7 +93,7 @@ export default class SpectrogramPlugin {
             console.log("SPECTROGRAM STATE 0")
             this.createWrapper();
             console.log("SPECTROGRAM STATE 1")
-            this.createCanvas();
+            this.createCanvas(true);
             console.log("SPECTROGRAM STATE 2")
             this.render(true);
             console.log("SPECTROGRAM STATE 3")
@@ -272,8 +273,11 @@ export default class SpectrogramPlugin {
             document.createElement('canvas')
         ));
  
-        this.spectrCc = canvas.getContext('2d');
- 
+        //this.spectrCc = canvas.getContext('2d');
+        
+        
+        //this.worker =;
+        
         this.util.style(canvas, {
             position: 'relative',
             zIndex: 0,
@@ -283,13 +287,16 @@ export default class SpectrogramPlugin {
  
     render(zoom=false) {
         this.updateCanvasStyle(zoom);
- 
+        var offscreen = this.canvas.transferControlToOffscreen();
+        
+        var data = null;
         if (this.frequenciesDataUrl) {
             console.log("ITS RUNNING THIS ONE!!")
             this.loadFrequenciesData(this.frequenciesDataUrl);
         } else {
-            this.getFrequencies(this.drawSpectrogram);
-        }
+            this.getFrequencies();
+        }//this.drawSpectrogram
+        this.worker.postMessage({canvas: offscreen, object: this, test: "Hello world"}, [offscreen]);
     }
  
     updateCanvasStyle(zoom=false) {
@@ -313,9 +320,20 @@ export default class SpectrogramPlugin {
         let j;
         console.log("length of pixels1 " +  pixels.length)
         console.log("length of pixels2 " + pixels[0].length)
+        console.log(new Date())
         for (i = 0; i < pixels.length; i++) {
             for (j = 0; j < pixels[i].length; j++) {
+                var start = Date.now
                 const colorMap = my.colorMap[pixels[i][j]];
+                /*var imgData =  spectrCc.createImageData(1, heightFactor);
+                var q;
+                for (q = 0; q < imgData.data.length; q += 4) {
+                imgData.data[i+0] = colorMap[0] * 256;
+                imgData.data[i+1] = colorMap[1] * 256 ;
+                imgData.data[i+2] = colorMap[2] * 256 ;
+                imgData.data[i+3] = colorMap[3];
+                }
+                spectrCc.putImageData(imgData, i,  height - j * heightFactor);*/
                 my.spectrCc.fillStyle =
                     'rgba(' +
                     colorMap[0] * 256 +
@@ -332,8 +350,10 @@ export default class SpectrogramPlugin {
                     1,
                     heightFactor
                 );
+                console.log (Date.now - start)
             }
         }
+        console.log(new Date())
     }
  
     getFrequencies(callback) {
@@ -380,14 +400,15 @@ export default class SpectrogramPlugin {
             frequencies.push(array);
             currentOffset += fftSamples - noverlap;
         }
-        callback(frequencies, this);
+        this.colorData = frequencies
+        //callback(frequencies, this);
     }
  
     loadFrequenciesData(url) {
         const request = this.util.fetchFile({ url: url });
  
         request.on('success', data =>
-            this.drawSpectrogram(JSON.parse(data), this)
+            this.colorData = data
         );
         request.on('error', e => this.fireEvent('error', e));
  
