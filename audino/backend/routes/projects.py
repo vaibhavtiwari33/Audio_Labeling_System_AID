@@ -513,6 +513,66 @@ def get_segmentations_for_data(project_id, data_id):
     return (jsonify(response), 200)
 
 
+@api.route("/projects/<int:project_id>/data/<int:data_id>/offscreencanvas.js", methods=["GET"])
+@jwt_required
+def get_segmentations_for_data2(project_id, data_id):
+    identity = get_jwt_identity()
+
+    try:
+        request_user = User.query.filter_by(username=identity["username"]).first()
+        project = Project.query.get(project_id)
+
+        if request_user not in project.users:
+            app.logger.info(project.users.id)
+            app.logger.info(request_user.id)
+            return jsonify(message="Unauthorized access!"), 401
+
+        data = Data.query.filter_by(id=data_id, project_id=project_id).first()
+
+        segmentations = []
+        for segment in data.segmentations:
+            resp = {
+                "segmentation_id": segment.id,
+                "start_time": segment.start_time,
+                "end_time": segment.end_time,
+                "transcription": segment.transcription,
+            }
+
+            values = dict()
+            for value in segment.values:
+                if value.label.name not in values:
+                    values[value.label.name] = {
+                        "label_id": value.label.id,
+                        "values": []
+                        if value.label.label_type.type == "multiselect"
+                        else None,
+                    }
+
+                if value.label.label_type.type == "multiselect":
+                    values[value.label.name]["values"].append(value.id)
+                else:
+                    values[value.label.name]["values"] = value.id
+
+            resp["annotations"] = values
+
+            segmentations.append(resp)
+
+        response = {
+            "filename": data.filename,
+            "original_filename": data.original_filename,
+            "reference_transcription": data.reference_transcription,
+            "is_marked_for_review": data.is_marked_for_review,
+            "segmentations": segmentations,
+        }
+
+    except Exception as e:
+        app.logger.error("Error fetching datapoint with given id")
+        app.logger.error(e)
+        return (jsonify(message="Error fetching datapoint with given id"), 404)
+
+    return (jsonify(response), 200)
+
+
 @api.route("/projects/<int:project_id>/data/<int:data_id>", methods=["PATCH"])
 @jwt_required
 def update_data(project_id, data_id):

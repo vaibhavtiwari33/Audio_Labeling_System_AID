@@ -1,6 +1,7 @@
 /* eslint-enable complexity, no-redeclare, no-var, one-var */
  
 import FFT from './fft';
+import * as offCanvas from './offscreencanvas.js';
  
 /**
  * @typedef {Object} SpectrogramPluginParams
@@ -78,7 +79,7 @@ export default class SpectrogramPlugin {
         this.params = params;
         this.wavesurfer = ws;
         this.util = ws.util;
-        this.worker =  new Worker("offscreencanvas.js") || null;
+        //this.worker =  new Worker("offscreencanvas.js") || null;
         this.frequenciesDataUrl = params.frequenciesDataUrl;
         this._onScroll = e => {
             this.updateScroll(e);
@@ -287,6 +288,8 @@ export default class SpectrogramPlugin {
  
     render(zoom=false) {
         this.updateCanvasStyle(zoom);
+        console.log("CREATING WORKER")
+        this.worker =  new Worker("offscreencanvas.js") 
         var offscreen = this.canvas.transferControlToOffscreen();
         
         var data = null;

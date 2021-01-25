@@ -1,5 +1,24 @@
-function drawSpectrogram(frequenciesData, my) {
-    const spectrCc = my.spectrCc;
+window.self.onmessage = function(evt) {
+//addEventListener('message', ({ data: { offscreenCanvas, width, height } }) => {
+    
+    try {
+        var canvas = evt.data.canvas;
+        var gl = canvas.getContext("2d");
+        console.log(evt.data.test)
+        console.log(evt.data.object)
+        drawSpectrogram(evt.data.object.colorData, evt.data.object, gl)
+        // ... some drawing using the gl context ...
+    } catch(e) {
+        console.log("HEY HEY HEY THERE IS AN ISSUE HERE")
+        console.log(e)
+    }
+    
+    
+  };
+
+
+function drawSpectrogram(frequenciesData, my, canvas) {
+    const spectrCc = canvas//my.spectrCc;
     //const length = my.wavesurfer.backend.getDuration();
     const height = my.height;
     const pixels = my.resample(frequenciesData);
@@ -22,7 +41,7 @@ function drawSpectrogram(frequenciesData, my) {
             imgData.data[i+3] = colorMap[3];
             }
             spectrCc.putImageData(imgData, i,  height - j * heightFactor);*/
-            my.spectrCc.fillStyle =
+            spectrCc.fillStyle =
                 'rgba(' +
                 colorMap[0] * 256 +
                 ', ' +
@@ -32,7 +51,7 @@ function drawSpectrogram(frequenciesData, my) {
                 ',' +
                 colorMap[3] +
                 ')';
-            my.spectrCc.fillRect(
+            spectrCc.fillRect(
                 i,
                 height - j * heightFactor,
                 1,
@@ -44,14 +63,3 @@ function drawSpectrogram(frequenciesData, my) {
     console.log(new Date())
 }
 
-onmessage = function(evt) {
-    var canvas = evt.data.canvas;
-    var gl = canvas.getContext("webgl");
-    console.log(evt.data.test)
-    console.log(evt.data.object)
-    drawSpectrogram(evt.data.object.colorData, evt.data.object)
-    // ... some drawing using the gl context ...
-    
-  };
-
-  
