@@ -2,7 +2,8 @@
  
 import FFT from './fft';
 import * as offCanvas from './offscreencanvas.js';
- 
+import worker from "./worker/worker.js"; //audino\frontend\src\worker\worker.js
+import WebWorker from "./worker/workerSetup";
 /**
  * @typedef {Object} SpectrogramPluginParams
  * @property {string|HTMLElement} container Selector of element or element in
@@ -289,8 +290,14 @@ export default class SpectrogramPlugin {
     render(zoom=false) {
         this.updateCanvasStyle(zoom);
         console.log("CREATING WORKER")
-        this.worker =  new Worker("offscreencanvas.js") 
-        var offscreen = this.canvas.transferControlToOffscreen();
+        let workerTest =  new WebWorker(worker);
+        workerTest.postMessage("oi");
+        workerTest.addEventListener('message', function(e) {
+            console.log('Message from Worker: ' + e.data);
+          });
+      
+        //worker.postMessage('Hello World');
+        
         
         var data = null;
         if (this.frequenciesDataUrl) {
@@ -299,7 +306,10 @@ export default class SpectrogramPlugin {
         } else {
             this.getFrequencies();
         }//this.drawSpectrogram
-        this.worker.postMessage({canvas: offscreen, object: this, test: "Hello world"}, [offscreen]);
+        console.log("sending render message")
+        var offscreen = this.canvas.transferControlToOffscreen();
+        console.log("control has been shoved over")
+        workerTest.postMessage({canvas: offscreen, object: this, test: "Hello world"}, [offscreen]);
     }
  
     updateCanvasStyle(zoom=false) {

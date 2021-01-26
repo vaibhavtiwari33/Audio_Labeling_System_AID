@@ -11,9 +11,14 @@ module.exports = {
         ArrayBuffer: true,
         __VERSION__: true
     },
+    overrides: {
+        files: ["**/*.worker.js"],
+        rules:"no-restricted-globals: [0]"
+    },
     env: {
         browser: true,
-        commonjs: true
+        commonjs: true,
+        worker: true
     },
     rules: {
         eqeqeq: 'off',

@@ -9,5 +9,6 @@ import Labels from "./labels";
 import LabelValues from "./labelValues";
 import Database from "./database"
 import CreateUser from "./createUser"
+import "../wavesurfer.js/src/plugin/spectrogram/offscreencanvas.js"
 //const About = lazy(() => import('./routes/About'));
 export { Admin, Dashboard, Error, Home, Labels, LabelValues, Data, Annotate, Database, CreateUser};

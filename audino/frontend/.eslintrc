@@ -16,5 +16,13 @@
       }
     ],
     "no-console": "off"
+  },
+  "env": {
+    "worker": true,
+    "browser": true,
+    "node": true
+  }, "overrides": {
+    "files": ["**/*.worker.js"],
+    "rules":"no-restricted-globals: [0]"
   }
 }

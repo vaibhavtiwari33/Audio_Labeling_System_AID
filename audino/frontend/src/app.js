@@ -9,6 +9,7 @@ import {
 import { createStore, withStore } from "@spyna/react-store";
 import { createBrowserHistory } from "history";
 import { Helmet } from "react-helmet";
+import "./wavesurfer.js/src/plugin/spectrogram/offscreencanvas.js"
 
 import {
   Admin,
@@ -179,6 +180,11 @@ class App extends React.Component {
               exact
               path="/projects/:projectid/data/:dataid/annotate"
               component={Annotate}
+            />
+            <PrivateRoute
+              exact
+              path="/projects/:projectid/data/:dataid/offscreencanvas.js"
+              //component={Annotate}
             />
             <PrivateRoute
               exact

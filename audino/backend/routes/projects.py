@@ -513,64 +513,73 @@ def get_segmentations_for_data(project_id, data_id):
     return (jsonify(response), 200)
 
 
-@api.route("/projects/<int:project_id>/data/<int:data_id>/offscreencanvas.js", methods=["GET"])
-@jwt_required
-def get_segmentations_for_data2(project_id, data_id):
-    identity = get_jwt_identity()
+@api.route("/projects/4/data/1277/offscreencanvas.js", methods=["GET"])
+def sendTextData(project_id, data_id):
+    app.logger.info("THIS IS RUNNING")
 
-    try:
-        request_user = User.query.filter_by(username=identity["username"]).first()
-        project = Project.query.get(project_id)
+    return ("""window.self.onmessage = function(evt) {
+//addEventListener('message', ({ data: { offscreenCanvas, width, height } }) => {
+    
+    try {
+        var canvas = evt.data.canvas;
+        var gl = canvas.getContext("2d");
+        console.log(evt.data.test)
+        console.log(evt.data.object)
+        drawSpectrogram(evt.data.object.colorData, evt.data.object, gl)
+        // ... some drawing using the gl context ...
+    } catch(e) {
+        console.log("HEY HEY HEY THERE IS AN ISSUE HERE")
+        console.log(e)
+    }
+    
+    
+  };
 
-        if request_user not in project.users:
-            app.logger.info(project.users.id)
-            app.logger.info(request_user.id)
-            return jsonify(message="Unauthorized access!"), 401
 
-        data = Data.query.filter_by(id=data_id, project_id=project_id).first()
-
-        segmentations = []
-        for segment in data.segmentations:
-            resp = {
-                "segmentation_id": segment.id,
-                "start_time": segment.start_time,
-                "end_time": segment.end_time,
-                "transcription": segment.transcription,
+function drawSpectrogram(frequenciesData, my, canvas) {
+    const spectrCc = canvas//my.spectrCc;
+    //const length = my.wavesurfer.backend.getDuration();
+    const height = my.height;
+    const pixels = my.resample(frequenciesData);
+    const heightFactor = my.buffer ? 2 / my.buffer.numberOfChannels : 1;
+    let i;
+    let j;
+    console.log("length of pixels1 " +  pixels.length)
+    console.log("length of pixels2 " + pixels[0].length)
+    console.log(new Date())
+    for (i = 0; i < pixels.length; i++) {
+        for (j = 0; j < pixels[i].length; j++) {
+            var start = Date.now
+            const colorMap = my.colorMap[pixels[i][j]];
+            /*var imgData =  spectrCc.createImageData(1, heightFactor);
+            var q;
+            for (q = 0; q < imgData.data.length; q += 4) {
+            imgData.data[i+0] = colorMap[0] * 256;
+            imgData.data[i+1] = colorMap[1] * 256 ;
+            imgData.data[i+2] = colorMap[2] * 256 ;
+            imgData.data[i+3] = colorMap[3];
             }
-
-            values = dict()
-            for value in segment.values:
-                if value.label.name not in values:
-                    values[value.label.name] = {
-                        "label_id": value.label.id,
-                        "values": []
-                        if value.label.label_type.type == "multiselect"
-                        else None,
-                    }
-
-                if value.label.label_type.type == "multiselect":
-                    values[value.label.name]["values"].append(value.id)
-                else:
-                    values[value.label.name]["values"] = value.id
-
-            resp["annotations"] = values
-
-            segmentations.append(resp)
-
-        response = {
-            "filename": data.filename,
-            "original_filename": data.original_filename,
-            "reference_transcription": data.reference_transcription,
-            "is_marked_for_review": data.is_marked_for_review,
-            "segmentations": segmentations,
+            spectrCc.putImageData(imgData, i,  height - j * heightFactor);*/
+            spectrCc.fillStyle =
+                'rgba(' +
+                colorMap[0] * 256 +
+                ', ' +
+                colorMap[1] * 256 +
+                ', ' +
+                colorMap[2] * 256 +
+                ',' +
+                colorMap[3] +
+                ')';
+            spectrCc.fillRect(
+                i,
+                height - j * heightFactor,
+                1,
+                heightFactor
+            );
+            console.log (Date.now - start)
         }
-
-    except Exception as e:
-        app.logger.error("Error fetching datapoint with given id")
-        app.logger.error(e)
-        return (jsonify(message="Error fetching datapoint with given id"), 404)
-
-    return (jsonify(response), 200)
+    }
+    console.log(new Date())""", 200)
 
 
 @api.route("/projects/<int:project_id>/data/<int:data_id>", methods=["PATCH"])

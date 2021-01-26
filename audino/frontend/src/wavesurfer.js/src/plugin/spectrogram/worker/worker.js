@@ -1,22 +1,32 @@
-window.self.onmessage = function(evt) {
-//addEventListener('message', ({ data: { offscreenCanvas, width, height } }) => {
-    
-    try {
-        var canvas = evt.data.canvas;
+/*eslint-env worker */
+/* eslint no-restricted-globals: 1 */
+export default () => {
+    //const isBrowser = () => typeof self !== "undefined"
+    self.addEventListener("message", e => { //const isBrowser = window && window.self.
+      // eslint-disable-line no-restricted-globals
+      if (!e) return;
+
+      console.log(e)
+      console.log("COMING FROM THE WORKER YO")
+
+      postMessage("hello");
+
+      try {
+        var canvas = e.data.canvas;
         var gl = canvas.getContext("2d");
-        console.log(evt.data.test)
-        console.log(evt.data.object)
-        drawSpectrogram(evt.data.object.colorData, evt.data.object, gl)
+        console.log(e.data.test)
+        console.log(e.data.object)
+        drawSpectrogram(e.data.object.colorData, e.data.object, gl)
+        postMessage("success!!!");
         // ... some drawing using the gl context ...
     } catch(e) {
         console.log("HEY HEY HEY THERE IS AN ISSUE HERE")
         console.log(e)
     }
-    
-    
-  };
+    });
 
-  function drawSpectrogram(frequenciesData, my, canvas) {
+    
+function drawSpectrogram(frequenciesData, my, canvas) {
     const spectrCc = canvas//my.spectrCc;
     //const length = my.wavesurfer.backend.getDuration();
     const height = my.height;
@@ -62,4 +72,4 @@ window.self.onmessage = function(evt) {
     console.log(new Date())
 }
 
-
+  };
