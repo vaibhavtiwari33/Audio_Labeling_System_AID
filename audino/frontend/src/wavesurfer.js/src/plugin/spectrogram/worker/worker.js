@@ -2,15 +2,19 @@
 /* eslint no-restricted-globals: 1 */
 export default () => {
     //const isBrowser = () => typeof self !== "undefined"
-    self.addEventListener("message", e => { //const isBrowser = window && window.self.
+    //self.addEventListener("message", e => { //const isBrowser = window && window.self.
       // eslint-disable-line no-restricted-globals
-      if (!e) return;
-
+      //if (!e) return;
+      self.onmessage = function (e) {
+      data = JSON.parse(e)
+      console.log("COMING FROM THE WORKER YO")
       console.log(e)
+      console.log(data)
+      console.log(e.data)
       console.log("COMING FROM THE WORKER YO")
 
-      postMessage("hello");
-
+      postMessage(e.data);
+      if (!e.data.canvas) return;
       try {
         var canvas = e.data.canvas;
         var gl = canvas.getContext("2d");
@@ -23,7 +27,7 @@ export default () => {
         console.log("HEY HEY HEY THERE IS AN ISSUE HERE")
         console.log(e)
     }
-    });
+    }//);
 
     
 function drawSpectrogram(frequenciesData, my, canvas) {

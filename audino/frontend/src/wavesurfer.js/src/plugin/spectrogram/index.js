@@ -291,7 +291,7 @@ export default class SpectrogramPlugin {
         this.updateCanvasStyle(zoom);
         console.log("CREATING WORKER")
         let workerTest =  new WebWorker(worker);
-        workerTest.postMessage("oi");
+        //workerTest.postMessage("oi");
         workerTest.addEventListener('message', function(e) {
             console.log('Message from Worker: ' + e.data);
           });
@@ -309,7 +309,10 @@ export default class SpectrogramPlugin {
         console.log("sending render message")
         var offscreen = this.canvas.transferControlToOffscreen();
         console.log("control has been shoved over")
-        workerTest.postMessage({canvas: offscreen, object: this, test: "Hello world"}, [offscreen]);
+        //code is getting stuck here, find out why
+        workerTest.postMessage(JSON.stringify({canvas: offscreen, object: offscreen}));
+        console.log("message sent")
+        workerTest.postMessage("Test"); //, [offscreen]
     }
  
     updateCanvasStyle(zoom=false) {
