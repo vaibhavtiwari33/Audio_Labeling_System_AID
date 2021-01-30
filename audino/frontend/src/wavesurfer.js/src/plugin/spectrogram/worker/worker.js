@@ -6,14 +6,13 @@ export default () => {
       // eslint-disable-line no-restricted-globals
       //if (!e) return;
       self.onmessage = function (e) {
-      data = JSON.parse(e)
+      //let data = JSON.parse(e)
       console.log("COMING FROM THE WORKER YO")
       console.log(e)
-      console.log(data)
       console.log(e.data)
       console.log("COMING FROM THE WORKER YO")
 
-      postMessage(e.data);
+      //postMessage(e.data);
       if (!e.data.canvas) return;
       try {
         var canvas = e.data.canvas;

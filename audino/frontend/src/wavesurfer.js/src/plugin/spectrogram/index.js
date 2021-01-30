@@ -310,9 +310,12 @@ export default class SpectrogramPlugin {
         var offscreen = this.canvas.transferControlToOffscreen();
         console.log("control has been shoved over")
         //code is getting stuck here, find out why
-        workerTest.postMessage(JSON.stringify({canvas: offscreen, object: offscreen}));
+        console.log(offscreen)
+        var data = JSON.stringify(offscreen)
+        console.log(data)
+        workerTest.postMessage("message", [offscreen]);
         console.log("message sent")
-        workerTest.postMessage("Test"); //, [offscreen]
+        //workerTest.postMessage("Test"); //, [offscreen]
     }
  
     updateCanvasStyle(zoom=false) {
