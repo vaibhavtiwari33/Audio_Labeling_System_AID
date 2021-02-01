@@ -53,6 +53,7 @@ import WebWorker from "./worker/workerSetup";
  *   ]
  * });
  */
+
 export default class SpectrogramPlugin {
     /**
      * Spectrogram plugin definition factory
@@ -76,6 +77,8 @@ export default class SpectrogramPlugin {
     }
  
     constructor(params, ws) {
+        this.workerCanvas = new WebWorker(worker)
+        this.isWorking = false
         this.colorData = null;
         this.params = params;
         this.wavesurfer = ws;
@@ -287,19 +290,25 @@ export default class SpectrogramPlugin {
         });
     }
  
-    render(zoom=false) {
-        this.updateCanvasStyle(zoom);
+    async render(zoom=false) {
+        if (!this.isWorking) {
+            this.updateCanvasStyle(zoom);
+            this.isWorking = true;
+        } else {
+            console.log("HANDLED CANVAS ERRORS")
+            return;
+        }
+        
         console.log("CREATING WORKER")
-        let workerTest =  new WebWorker(worker);
+        //let workerTest =  new WebWorker(worker);
         //workerTest.postMessage("oi");
-        workerTest.addEventListener('message', function(e) {
+        this.workerCanvas.addEventListener('message', function(e) {
             console.log('Message from Worker: ' + e.data);
           });
       
         //worker.postMessage('Hello World');
         
         
-        var data = null;
         if (this.frequenciesDataUrl) {
             console.log("ITS RUNNING THIS ONE!!")
             this.loadFrequenciesData(this.frequenciesDataUrl);
@@ -307,13 +316,27 @@ export default class SpectrogramPlugin {
             this.getFrequencies();
         }//this.drawSpectrogram
         console.log("sending render message")
+        
         var offscreen = this.canvas.transferControlToOffscreen();
         console.log("control has been shoved over")
         //code is getting stuck here, find out why
         console.log(offscreen)
-        var data = JSON.stringify(offscreen)
+        var data = [this.colorData, this.height, this.width, this.buffer ? 2 / this.buffer.numberOfChannels : 1, this.colorMap];//this.colorData, this.height, this.width, this.buffer, this.colorMap]
+        /*let data = new Map()
+        data["offscreen"] =  offscreen
+        data["colorData"] =  this.colorData
+        data["height"] =  this.height
+        data["width"] =  this.width
+        data["buffer"] =  this.buffer
+        data["colorMap"] =  this.colorMap*/
+       
+        data = {"obj": data}
         console.log(data)
-        workerTest.postMessage("message", [offscreen]);
+        console.log(typeof(data))
+        //{'key1': 'value1','key2': 'value2'} {"offscreen": offscreen, "colorData" : this.colorData, "height": this.height, "width": this.width, "buffer" :this.buffer, "colorMap": this.colorMap]
+        console.log(new Date())
+        this.workerCanvas.postMessage({offscreen, data}, [offscreen]);
+            //data, [data]);//offscreen, [offscreen, this.colorData, this.height, this.width, this.buffer, this.colorMap]);//this.colorData, this.height, this.width, this.buffer, this.colorMap]
         console.log("message sent")
         //workerTest.postMessage("Test"); //, [offscreen]
     }
@@ -585,4 +608,3 @@ export default class SpectrogramPlugin {
     }
 }
  
-
