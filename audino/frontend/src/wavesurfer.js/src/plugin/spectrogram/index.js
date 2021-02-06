@@ -331,8 +331,8 @@ export default class SpectrogramPlugin {
                 }
                 /* eslint-enable max-depth */
             }
+            spectrCc.putImageData(imageData, 0, 0);
         }
-        spectrCc.putImageData(imageData, 0, 0);
     }
  
     getFrequencies(callback) {

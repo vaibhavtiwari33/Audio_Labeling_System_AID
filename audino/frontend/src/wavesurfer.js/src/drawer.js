@@ -161,9 +161,9 @@ export default class Drawer extends util.Observer {
         if (visualization === 'invisible') {
             //draw nothing
         } else if (visualization === 'spectrogram' && buffer) {
-            console.log(new Date().toLocaleString())
-            this.drawSpectrogram(buffer);
-            console.log(new Date().toLocaleString())
+            //console.log(new Date().toLocaleString())
+            //this.drawSpectrogram(buffer);
+            //console.log(new Date().toLocaleString())
         } else {
             this.params.barWidth ? 
             this.drawBars(peaks, 0, start, end)
