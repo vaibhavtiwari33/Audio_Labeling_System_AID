@@ -30,6 +30,7 @@ const Button = ({
   isDisabled = false,
   onClick = noop,
   isSubmitting: showLoader = false,
+  style
 }) => {
   return (
     <button
@@ -38,6 +39,7 @@ const Button = ({
       disabled={isDisabled}
       onClick={onClick}
       title={title}
+      style={style}
     >
       {text}
       {showLoader ? (

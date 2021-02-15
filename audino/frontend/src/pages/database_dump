@@ -1,0 +1,116 @@
+ //USE TO GET ALL THE DATA SORTED BY PROJECTS
+    omponentDidMount() {
+        this.getProjectData();
+        this.getUserData();
+        this.setState({ isDataLoading: true });
+        let { apiUrl, page, active } = this.state;
+        //apiUrl = `${apiUrl}?page=${page}&active=${active}`;
+        apiUrl = `/current_user/projects/get_all`
+        console.log("hello there")
+        axios({
+          method: "get",
+          url: apiUrl,
+        })
+          .then((response) => {
+            const {
+              data,
+              count,
+            } = response.data;
+            this.setState({
+              data,
+              isDataLoading: false,
+            });
+            console.log(data)
+          })
+          .catch((error) => {
+            this.setState({
+              errorMessage: error.response.data.message,
+              isDataLoading: false,
+            });
+          });
+        //datas = data;
+      }
+
+    select(e) {
+        console.log("hi")
+    }
+    getUserData()  {
+        let { apiUrl, page, active } = this.state;
+         if (this.state.data == 0) {
+            //apiUrl = `${apiUrl}?page=${page}&active=${active}`;
+            apiUrl = '/api/current_user/projects/get_all'
+            console.log("hello there")
+            axios({
+            method: "get",
+            url: apiUrl,
+            })
+            .then((response) => {
+                const {
+                data,
+                } = response.data;
+                this.setState({
+                users: data,
+                isDataLoading: false,
+                });
+                console.log(data)
+            })
+            .catch((error) => {
+                this.setState({
+                errorMessage: error.response.users.message,
+                isDataLoading: false,
+                });
+            });
+        }
+        var data  = this.state.data
+        //datas = data
+        //var isDataLoading = false;
+        var projectId = 1;
+        console.log(data.length);
+        if (data.length > 0) {
+            this.state.isDataLoading = false;
+        }
+        return data;
+    }
+
+    getProjectData() {
+        let { apiUrl, page, active } = this.state;
+         if (this.state.data == 0) {
+            //apiUrl = `${apiUrl}?page=${page}&active=${active}`;
+            apiUrl = '/api/users'
+            console.log("hello there")
+            axios({
+            method: "get",
+            url: apiUrl,
+            })
+            .then((response) => {
+                const {
+                data,
+                count,
+                } = response.data;
+                this.setState({
+                    projects: data,
+                isDataLoading: false,
+                });
+                console.log(data)
+            })
+            .catch((error) => {
+                console.log(error)
+                this.setState({
+                errorMessage: "something went wrong",
+                isDataLoading: false,
+                });
+            });
+        }
+        var data  = this.state.data
+        //datas = data
+        //var isDataLoading = false;
+        var projectId = 1;
+        if (data == null) {
+            return {}
+        }
+        console.log(data.length);
+        if (data.length > 0) {
+            this.state.isDataLoading = false;
+        }
+        return data;
+    }

@@ -132,7 +132,7 @@ class App extends React.Component {
       
     }
   }
-
+  //hello
   render() {
     const isUserLoggedIn = this.props.store.get("isUserLoggedIn");
     const isUserCreatingAccount = this.props.store.get("isUserCreatingAccount");

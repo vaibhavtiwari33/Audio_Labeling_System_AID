@@ -3,6 +3,7 @@ import React from "react";
 import { Helmet } from "react-helmet";
 import { withRouter } from "react-router-dom";
 import { IconButton, Button } from "../components/button";
+import { Folder } from "../components/folder";
 
 import Loader from "../components/loader";
 class Database extends React.Component {
@@ -17,9 +18,11 @@ class Database extends React.Component {
         projectId,
         data: [],
         users: [],
+        projects: [],
         //active: params.get("active") || "pending",
         //page: params.get("page") || 1,
         count: {
+          selected: 1,
           pending: 0,
           completed: 0,
           all: 0,
@@ -38,134 +41,33 @@ class Database extends React.Component {
       };
     }
 
-    //USE TO GET ALL THE DATA SORTED BY PROJECTS
-    omponentDidMount() {
-        this.setState({ isDataLoading: true });
-        let { apiUrl, page, active } = this.state;
-        //apiUrl = `${apiUrl}?page=${page}&active=${active}`;
-        apiUrl = `/current_user/projects/get_all`
-        console.log("hello there")
-        axios({
-          method: "get",
-          url: apiUrl,
-        })
-          .then((response) => {
-            const {
-              data,
-              count,
-            } = response.data;
-            this.setState({
-              data,
-              isDataLoading: false,
-            });
-            console.log("hello there")
-          })
-          .catch((error) => {
-            this.setState({
-              errorMessage: error.response.data.message,
-              isDataLoading: false,
-            });
-          });
-        //datas = data;
-      }
-
-    select(e) {
-        console.log("hi")
-    }
-    getUserData()  {
-        let { apiUrl, page, active } = this.state;
-         if (this.state.data == 0) {
-            //apiUrl = `${apiUrl}?page=${page}&active=${active}`;
-            apiUrl = '/api/current_user/projects/get_all'
-            console.log("hello there")
-            axios({
-            method: "get",
-            url: apiUrl,
-            })
-            .then((response) => {
-                const {
-                data,
-                } = response.data;
-                this.setState({
-                users: data,
-                isDataLoading: false,
-                });
-                console.log("hello there")
-            })
-            .catch((error) => {
-                this.setState({
-                errorMessage: error.response.users.message,
-                isDataLoading: false,
-                });
-            });
-        }
-        var data  = this.state.data
-        //datas = data
-        //var isDataLoading = false;
-        var projectId = 1;
-        console.log(data.length);
-        if (data.length > 0) {
-            this.state.isDataLoading = false;
-        }
-        return data;
-    }
-
-    getProjectData() {
-        let { apiUrl, page, active } = this.state;
-         if (this.state.data == 0) {
-            //apiUrl = `${apiUrl}?page=${page}&active=${active}`;
-            apiUrl = '/api/users'
-            console.log("hello there")
-            axios({
-            method: "get",
-            url: apiUrl,
-            })
-            .then((response) => {
-                const {
-                data,
-                count,
-                } = response.data;
-                this.setState({
-                data,
-                isDataLoading: false,
-                });
-                console.log("hello there")
-            })
-            .catch((error) => {
-                this.setState({
-                errorMessage: error.response.data.message,
-                isDataLoading: false,
-                });
-            });
-        }
-        var data  = this.state.data
-        //datas = data
-        //var isDataLoading = false;
-        var projectId = 1;
-        console.log(data.length);
-        if (data.length > 0) {
-            this.state.isDataLoading = false;
-        }
-        return data;
-    }
-
-    collaspable(e) {
-        var coll = document.getElementsByClassName("table table-striped text-center");
-        var i = 0;
-        for (var i = 0; i+ 1 > coll.length; i++) {
-            coll[i].addEventListener("click", function() {
-                this.classList.toggle("active");
-                var content = this.nextElementSibling;
-                if (content.style.maxHeight){
-                content.style.maxHeight = null;
-                } else {
-                content.style.maxHeight = content.scrollHeight + "px";
-                } 
-            })
-        }
-    }
-
+    changeSelected (e)  {
+       console.log(e)
+   }
     render() {
+        return (
+            <div>
+                <Folder
+                    id={0}
+                    onClick={() => {this.changeSelected(0);}}
+                    pos={'0'}
+                    color={"rgba(201, 76, 76, 0.3)"}
+                    z={0}
+                    hidden={false}
+                />
+                <Folder
+                    id={1}
+                    onClick={() => {this.changeSelected(1);}}
+                    pos={'35%'}
+                    color={"rgba(76, 201, 76, 0.3)"}
+                    z={1}
+                    hidden={true}
+                />
+            </div>
+        );
+    }
+
+
         /**
          * Goals to implement
          *      Get buttons to select rows
@@ -175,11 +77,10 @@ class Database extends React.Component {
          */
         
          //NOTE TO SELF, IF THE DATA ISN"T LOADING CHECK THE LENGTH OF THE DATA TO MAKE SURE IT IS IN THE RIGHT FORMAT VIA DATA.LENGTH (should be a value not undefined)
-         this.state.isDataLoading = true;
-         let data = this.getProjectData();
-            
+         //this.state.isDataLoading = true;
+         
+        /*let data = this.state.users;
         console.log(this.state.isDataLoading)
-        console.log(data);
         return(
             <div>
                 <Helmet>
@@ -194,19 +95,8 @@ class Database extends React.Component {
                     </div>
                 {!this.state.isDataLoading ? (
                     <div>
-                        <div className="col float-left">
-                            <h1>Data</h1>
-                            <Button
-                                size="lg"
-                                type="primary"
-                                //disabled={isSegmentSaving}
-                                onClick={(e) => this.collaspable(e)}
-                            
-                                text="expand"
-                            />
-                        </div>
                         {data.length > 0 ? (
-                            <table className="table table-striped text-center">
+                            <table className="table table-striped text-center" styles={{ height: '500px', overflowY: 'scroll' }}>
                                 <thead>
                                     <tr>
                                         <th scope="col">Select</th>
@@ -262,7 +152,7 @@ class Database extends React.Component {
             </div> 
             </div>
         );
-    }
+    }*/
 }
 
 /*
