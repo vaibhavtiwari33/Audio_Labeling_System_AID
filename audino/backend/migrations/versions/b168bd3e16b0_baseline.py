@@ -1,8 +1,8 @@
 """baseline
 
-Revision ID: e6b1ce245b01
+Revision ID: b168bd3e16b0
 Revises: 
-Create Date: 2021-02-21 22:17:54.030888
+Create Date: 2021-03-17 06:36:58.434554
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e6b1ce245b01'
+revision = 'b168bd3e16b0'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -67,6 +67,8 @@ def upgrade():
     sa.Column('is_marked_for_review', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('last_modified', sa.DateTime(), nullable=False),
+    sa.Column('sampling_rate', sa.Integer(), nullable=False),
+    sa.Column('clip_length', sa.Float(), nullable=False),
     sa.ForeignKeyConstraint(['project_id'], ['project.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('filename')
