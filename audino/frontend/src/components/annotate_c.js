@@ -67,6 +67,14 @@ class Annotate_C extends React.Component {
   }
 
   componentDidMount() {
+    window.addEventListener('resize', () => {
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+      console.log (w, h)
+         
+      window.resizeTo(700, 100);
+      window.focus();
+    });
     console.log(new Date().toLocaleString())
     let {page, active } = this.state;
 
