@@ -38,10 +38,10 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
-    - task: DockerCompose@0
-      inputs:
-        containerregistrytype: 'Azure Container Registry'
-        azureSubscription: 'Azure subscription 1(06b27546-79a8-409e-b513-5f0698aba19a)'
-        dockerComposeFile: '**/audino/docker-compose.dev.yml'
-        action: 'Run a Docker Compose command'
-        dockerComposeCommand: 'rm --all'
+    #- task: DockerCompose@0
+    #  inputs:
+    #    containerregistrytype: 'Azure Container Registry'
+    #    azureSubscription: 'Azure subscription 1(06b27546-79a8-409e-b513-5f0698aba19a)'
+    #    dockerComposeFile: '**/audino/docker-compose.dev.yml'
+    #    action: 'Run a Docker Compose command'
+    #    dockerComposeCommand: 'rm --all'
